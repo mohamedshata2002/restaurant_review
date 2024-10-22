@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from app.routers import restaurant
+from app.routers import restaurant ,users
 
 app = FastAPI()
 
@@ -7,3 +7,4 @@ app = FastAPI()
 def test():
     return {"Hello world"}
 app.include_router(restaurant.router)
+app.include_router(users.router)
