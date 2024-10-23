@@ -49,3 +49,39 @@ class Token_response (BaseModel):
     
     class Config:
         orm_mode = True
+
+
+
+class reservation(BaseModel):
+    date : date 
+    number_of_people :int
+    class Config:
+        orm_mode = True
+
+class reservation_in(reservation):
+    creator:Optional[int]=None
+    at_restaurant:Optional[int]=None
+
+class reservation_out(reservation):
+    user:user_out
+    restaurant:restaurant_out
+    Id:int 
+    created_at:datetime
+    class Config:
+        orm_mode = True
+
+
+
+class review(BaseModel):
+    Rating :int
+    comment:str
+    class Config:
+        orm_mode = True
+class review_in(review):
+    at_restaurant:Optional[int]=None
+    user_id :Optional[int]=None
+class review_out(review):
+    user:user_out
+    restaurant :restaurant_out
+    created_at :datetime
+    Id :int
