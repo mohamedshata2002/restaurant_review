@@ -84,4 +84,4 @@ class review_out(review):
     user:user_out
     restaurant :restaurant_out
     created_at :datetime
-    Id :int
+    Icd sd :int
