@@ -1,6 +1,6 @@
 from pydantic import BaseModel ,EmailStr
-from datetime import date ,datetime
-
+from datetime import date ,datetime 
+from typing import Optional
 
  
 class restaurant(BaseModel):
@@ -10,18 +10,21 @@ class restaurant(BaseModel):
     Cusine_type:str
     Website:str
     created_at:date
+    
     class Config:
         orm_mode = True
 
 class restaurant_in(restaurant):
+     owned_by :Optional[int] =None
      pass
 
-class restaurant_out(restaurant):
-    Id :int
+
 
 class user(BaseModel):
     name:str
     phone_number:int
+    class Config:
+        from_attributes = True  
     
 
 class user_in(user):
@@ -30,4 +33,19 @@ class user_in(user):
 
 class user_out(user):
     Id:int
-    created_at: datetime
+    time: datetime
+
+class restaurant_out(restaurant):
+    user : user_out
+    Id :int
+
+class Token_data(BaseModel):
+    id :Optional[int]=None 
+
+
+class Token_response (BaseModel):
+    token: str
+    token_type:str
+    
+    class Config:
+        orm_mode = True

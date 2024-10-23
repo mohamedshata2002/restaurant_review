@@ -1,8 +1,8 @@
 from app.db import Base 
-from sqlalchemy import Column,Integer,String,Date
+from sqlalchemy import Column,Integer,String,Date,ForeignKey
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-
+from sqlalchemy.orm import relationship
 class restaurant(Base):
     __tablename__ = "restaurant"
     Id= Column(Integer,primary_key=True,nullable=False)
@@ -12,6 +12,8 @@ class restaurant(Base):
     Cusine_type = Column(String,nullable=False)
     Website = Column(String,nullable=False)
     created_at =  Column(Date, nullable=False, server_default=text("CURRENT_DATE"))
+    owned_by =Column(Integer,ForeignKey("user.Id",ondelete="CASCADE"),nullable=False)
+    user = relationship("user")
 
 class user(Base):
     __tablename__ = "user"

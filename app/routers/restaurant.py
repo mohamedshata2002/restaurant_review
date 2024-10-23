@@ -5,11 +5,12 @@ from sqlalchemy.orm import Session
 from app.db import get_db 
 from typing import List
 from app.tables import restaurant
-
+from app.othen import get_current_user
 router = APIRouter(prefix="/restaurant",tags=["restaurant"])
 
 @router.post('/create',status_code = status.HTTP_201_CREATED)
-def create_restaurant(rest:restaurant_in,db:Session=Depends(get_db)):
+def create_restaurant(rest:restaurant_in,db:Session=Depends(get_db),userid:int=Depends(get_current_user)):
+    rest.owned_by = userid.id
     result = restaurant(**rest.dict())
     db.add(result)
     db.commit()
@@ -34,20 +35,31 @@ def get_restuarant(db:Session=Depends(get_db)):
 
 
 @router.delete("/delete/{id}",status_code=status.HTTP_204_NO_CONTENT)
-def delete_restaurent(id:int,db:Session=Depends(get_db)):
+def delete_restaurent(id:int,db:Session=Depends(get_db),userid:int=Depends(get_current_user)):
     result = db.query(restaurant).filter(restaurant.Id==id)
-    if not result :
+    if not result.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="These restuarant is not found")
+    
+    owner_id = result.first().owned_by
+    if owner_id != userid.id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    
     result.delete(synchronize_session=False)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/update/{id}",status_code=status.HTTP_200_OK,response_model=restaurant_out)
-def update_restaurant (id:int,rest:restaurant_in,db:Session=Depends(get_db)):
+def update_restaurant (id:int,rest:restaurant_in,db:Session=Depends(get_db),userid:int=Depends(get_current_user)):
+    
     result = db.query(restaurant).filter(restaurant.Id==id)
-    if not result :
+    if not result.first():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="These restuarant is not found")
+    
+    owner_id = result.first().owned_by
+    if owner_id != userid.id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    rest.owned_by = userid.id
     rest = rest.dict()
     result.update(rest,synchronize_session=False)
     db.commit()
